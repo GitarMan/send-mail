@@ -13,7 +13,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-app.post('/contact-form', (req, res) => {
+app.post('/send-mail', (req, res) => {
 
   logger.info('Request:');
   logger.info(req.body);

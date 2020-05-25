@@ -7,7 +7,7 @@ var express = require('express'),
     nodeMailer = require('nodemailer');
 
 var app = express();
-var port = 3001;
+var port = process.env.LISTEN_PORT;
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));

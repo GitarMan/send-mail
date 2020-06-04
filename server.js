@@ -4,13 +4,27 @@ logger.info('Logger is working');
 
 var express = require('express'),
     path = require('path'),
-    nodeMailer = require('nodemailer');
+    nodeMailer = require('nodemailer'),
+    cors = require('cors');
 
 var app = express();
 var port = process.env.LISTEN_PORT;
 
+const whitelist = process.env.CORS_WHITELIST;
+
+app.use(cors({
+  origin: function(origin, callback){
+    if(whitelist.indexOf(origin) === -1){
+      var message = "The CORS policy for this origin doesn't " +
+                'allow access from the particular origin.';
+      return callback(new Error(message), false);
+    }
+    return callback(null, true);
+  }
+}));
+
+
 var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.post('/send-mail', (req, res) => {

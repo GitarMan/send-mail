@@ -7,6 +7,8 @@ var express = require('express'),
     nodeMailer = require('nodemailer'),
     cors = require('cors');
 
+const { check, validationResult } = require('express-validator');
+
 var app = express();
 var port = process.env.LISTEN_PORT;
 
@@ -23,14 +25,22 @@ app.use(cors({
   }
 }));
 
-
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-app.post('/send-mail', (req, res) => {
+app.post('/send-mail', [
+    check('name').exists().withMessage('Please enter your name'),
+    check('email').isEmail().withMessage('Please enter a valid email')
+  ],
+  (req, res) => {
 
   logger.info('Request:');
   logger.info(req.body);
+
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
 
   let transporter = nodeMailer.createTransport({
     host: process.env.EMAIL_HOST,

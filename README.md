@@ -18,6 +18,8 @@ Start the server with `npm start`
 #
 # NODE_ENV=dev|production
 #
+# CORS_WHITELIST=['http://localhost:3000']
+#
 # LISTEN_PORT=3000
 #
 # EMAIL_HOST=smtp.zoho.com

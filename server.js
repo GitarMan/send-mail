@@ -2,6 +2,8 @@ require('dotenv').config();
 const logger = require('./logger.js');
 logger.info('Logger is working');
 
+const helmet = require('helmet')
+
 var express = require('express'),
     path = require('path'),
     nodeMailer = require('nodemailer'),
@@ -11,6 +13,8 @@ const { check, validationResult } = require('express-validator');
 
 var app = express();
 var port = process.env.LISTEN_PORT;
+
+app.use(helmet());
 
 const whitelist = process.env.CORS_WHITELIST;
 

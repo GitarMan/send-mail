@@ -7,12 +7,20 @@ const helmet = require('helmet')
 var express = require('express'),
     path = require('path'),
     nodeMailer = require('nodemailer'),
+    https = require("https"),
+    fs = require("fs"),
     cors = require('cors');
+
+const httpsOptions = {
+    key: fs.readFileSync(process.env.HTTPS_KEY_PATH),
+    cert: fs.readFileSync(process.env.HTTPS_CERT_PATH)
+};
 
 const { check, validationResult } = require('express-validator');
 
 var app = express();
-var port = process.env.LISTEN_PORT;
+var port = process.env.LISTEN_PORT_HTTP;
+var httpsPort = process.env.LISTEN_PORT_HTTPS;
 
 app.use(helmet());
 
@@ -20,14 +28,21 @@ const whitelist = process.env.CORS_WHITELIST;
 
 app.use(cors({
   origin: function(origin, callback){
-    if(whitelist.indexOf(origin) === -1){
-      var message = "The CORS policy for this origin doesn't " +
+    if( origin !== undefined && whitelist.indexOf(origin) === -1){
+      var message = 'Origin: ' + origin + " The CORS policy for this origin doesn't " +
                 'allow access from the particular origin.';
       return callback(new Error(message), false);
     }
     return callback(null, true);
   }
 }));
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", process.env.HEADER_ACCESS_CONTROL_ALLOW_ORIGIN);
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -76,4 +91,14 @@ app.post('/send-mail', [
   });
 });
 
-app.listen(port, 'localhost', () => logger.info('Server is running at port: %s', port));
+app.listen(
+           port, 
+           () => logger.info('Server is running at port: %s', port)
+          );
+
+https.createServer(httpsOptions, app)
+  .listen(
+           httpsPort, 
+           () => logger.info('https port: %s', httpsPort)
+         );
+
